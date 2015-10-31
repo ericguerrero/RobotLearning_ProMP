@@ -48,7 +48,13 @@ cov_w = (cov_w +cov_w)/2 + eye(size(cov_w))*lamda;
 upper_ci = phi'*(w_mean+2*sqrt(diag(cov_w)))
 lower_ci = phi'*(w_mean-2*sqrt(diag(cov_w)))
 
+upper_ci_std_w = phi'*(w_mean+1.96*std_w/sqrt(n))
+lower_ci_std_w = phi'*(w_mean-1.96*std_w/sqrt(n))
+
 % CI
 plot(trajT,upper_ci,'--r','lineWidth',2);
 plot(trajT,lower_ci,'--r','lineWidth',2);
+
+plot(trajT,upper_ci_std_w,'--b','lineWidth',2);
+plot(trajT,lower_ci_std_w,'--b','lineWidth',2);
 hold off
