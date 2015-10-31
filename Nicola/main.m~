@@ -1,13 +1,13 @@
 clc;close all;clear all; format compact;
 
 %% Demostrations
-num = 20; % # of demostrations
-position = [1, 3.5, 3]; 
+num = 10; % # of demostrations
+position = [1, 2.5, 3]; 
 time = [0 30 60];  
 [trajT, trajX] = trajGeneration(num,position,time);
 
 %% Basis functions
-n=60; % number of basis functions
+n=100; % number of basis functions
 sigma = 1.5; %variance
 mu = linspace(0,max(time),n);
 
@@ -37,18 +37,4 @@ mean_t = phi'*w_mean;
 plot(trajT,mean_t,'LineWidth',2)
 
 %% variance
-% Standard deviation
-std_w= std(w,0,2);
-% Covariance
-cov_w = (w-w_mean*ones(1,num))*(w-w_mean*ones(1,num))'/num;
-lamda = 10^(-3);
-cov_w = (cov_w +cov_w)/2 + eye(size(cov_w))*lamda;
-
-%% Confidence Intervals (95%)
-upper_ci = phi'*(w_mean+2*sqrt(diag(cov_w)))
-lower_ci = phi'*(w_mean-2*sqrt(diag(cov_w)))
-
-% CI
-plot(trajT,upper_ci,'--r','lineWidth',2);
-plot(trajT,lower_ci,'--r','lineWidth',2);
-hold off
+Sigma_w=(1/length(w_mean))*()
