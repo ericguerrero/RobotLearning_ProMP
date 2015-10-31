@@ -4,7 +4,7 @@ clc;close all;clear all; format compact;
 
 %% Demostrations
 num = 20; % # of demostrations
-position = [1, 2.5, 3]; 
+position = [1, 2.5, -1]; 
 time = [0 30 60];  
 [trajT, trajX] = trajGeneration(num,position,time);
 
@@ -34,7 +34,7 @@ mu_w = mean(w,2);
 std_w= std(w,0,2);
 % Covariance
 cov_w = (w-mu_w*ones(1,num))*(w-mu_w*ones(1,num))'/num;
-lamda = 10^(-3);
+lamda = 10^(-9);
 cov_w = (cov_w +cov_w)/2 + eye(size(cov_w))*lamda;
 
 
@@ -119,9 +119,10 @@ fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
 title(sprintf('%d sampled trajectories',N_ITERATIONS))
 
 for i=1:N_ITERATIONS
+    i
     w_traj = mvnrnd(mu_w,cov_w)';
-        trajectory = phi'*w_traj;
-        figure(3)
-        plot(trajT,trajectory,'r','lineWidth',2);
-        pause(0.2)
+    trajectory = phi'*w_traj;
+    figure(3)
+    plot(trajT,trajectory,'r','lineWidth',2);
+    pause(0.1)
 end
