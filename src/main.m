@@ -12,7 +12,7 @@ time = [0 30 60];
 n=60; % number of basis functions
 sigma = 1.5; %variance
 mu = linspace(1,max(time)-1,n);
-
+    
 phi = zeros(n,length(trajT));
 for i = 1:n 
     phi(i,:)=gaussBasis(trajT,mu(i),sigma); % one bf per row
