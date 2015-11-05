@@ -3,14 +3,14 @@
 clc;close all;clear all; format compact;
 
 %% Demostrations
-num = 20; % # of demostrations
-position = [1, 2.5, -1]; 
+num = 30; % # of demostrations
+position = [1, 1.5 2]; 
 time = [0 30 60];  
 [trajT, trajX] = trajGeneration(num,position,time);
 
 %% Basis functions
-n=60; % number of basis functions
-sigma = 1.5; %variance
+n=20; % number of basis functions
+sigma = 3; %variance
 mu = linspace(0,max(time),n);
 
 phi = zeros(n,length(trajT));
