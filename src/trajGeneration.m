@@ -1,12 +1,14 @@
-function [trajT, trajX] =trajGeneration(num,position,time)
+function [trajT, trajX] =trajGeneration(num,position,time,delta_time)
+tt = 0:delta_time:1;
 
 trajX = [];
 for i=1:num
-    r = randn(1,3); % add some differences
-    coord = [time; position + position .* r/10];
-    s = fnplt(cscvn(coord)); % spline
-    trajX = [trajX s(2,:)'];
+    r = randn(1,length(position)); % add some differences
+    x =  position +  r/10;
+    s = spline(time,x,tt); % spline
+    trajX = [trajX s'];
 end
-trajT = s(1,:)';
+trajT = tt';
+
 end
 

@@ -1,18 +1,17 @@
-%% Eric's code with just added the CI computed with the covariacne matrix 
-
 clc;close all;clear all; format compact;
 
 %% Demostrations
-num = 30; % # of demostrations
-position = [1, 1.5 2]; 
-time = [0 30 60];  
-[trajT, trajX] = trajGeneration(num,position,time);
+num = 20; % # of demostrations
+position = [1 2.5 2 0.5 -1]; 
+time = [0 .4 .6 .8 1];  
+delta_time = 0.001
+[trajT, trajX] = trajGeneration(num,position,time,delta_time);
 
 %% Basis functions
-n=60; % number of basis functions
-sigma = 1.5; %variance
-mu = linspace(1,max(time)-1,n);
-    
+n=20; % number of basis functions
+sigma = 0.003; %variance
+mu = linspace(0,1,n);
+
 phi = zeros(n,length(trajT));
 for i = 1:n 
     phi(i,:)=gaussBasis(trajT,mu(i),sigma); % one bf per row
@@ -45,20 +44,17 @@ cov_y = (trajX-phi'*w)*(trajX-phi'*w)'/(num*n);
 % cov_y = (cov_y +cov_y)/2 + eye(size(cov_y))*lamda;
 
 %% Confidence Intervals (95%)
-upper_ci_std_w = phi'*(mu_w+1.96*std_w/sqrt(n));
-lower_ci_std_w = phi'*(mu_w-1.96*std_w/sqrt(n));
-
 % this I have no Idea about what CI is  :D
 upper_ci = phi'*(mu_w+2*sqrt(diag(cov_w)));
 lower_ci = phi'*(mu_w-2*sqrt(diag(cov_w)));
 
 %% Plots
-
 % Demostrations
 plot(trajT,trajX,'k');hold on;grid on;
 
 % Basis functions
-plot(trajT,phi,'g');
+scale = 10^2;
+plot(trajT,phi*scale,'g');
 
 % Weights
 %plot(mu,w/40,'r');
@@ -69,8 +65,6 @@ plot(trajT,mu_y,'r','lineWidth',2);
 % CI 
 plot(trajT,upper_ci,'--r','lineWidth',3);
 plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
 title(sprintf('%d trajectories     %d basis functions',num,n))
 
 fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
@@ -86,8 +80,6 @@ plot(trajT,trajectory,'r','lineWidth',2);
 hold on; grid on;
 plot(trajT,upper_ci,'--r','lineWidth',3);
 plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
 fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
 title('Random Trajectory created from the fit of the weights')
 
@@ -113,8 +105,6 @@ figure(3)
 hold on; grid on;
 plot(trajT,upper_ci,'--r','lineWidth',3);
 plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
 fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
 title(sprintf('%d sampled trajectories',N_ITERATIONS))
 
@@ -123,6 +113,6 @@ for i=1:N_ITERATIONS
     w_traj = mvnrnd(mu_w,cov_w)';
     trajectory = phi'*w_traj;
     figure(3)
-    plot(trajT,trajectory,'r','lineWidth',2);
+    plot(trajT,trajectory,'r');
     pause(0.1)
 end
