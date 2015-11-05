@@ -9,9 +9,15 @@ time = [0 30 60];
 [trajT, trajX] = trajGeneration(num,position,time);
 
 %% Basis functions
+<<<<<<< HEAD
 n=20; % number of basis functions
 sigma = 3; %variance
 mu = linspace(0,max(time),n);
+=======
+n=60; % number of basis functions
+sigma = 1.5; %variance
+mu = linspace(1,max(time)-1,n);
+>>>>>>> 7e46c519b988c2637d688345cd15416557fe74c9
 
 phi = zeros(n,length(trajT));
 for i = 1:n 
