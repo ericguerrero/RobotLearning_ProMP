@@ -11,7 +11,7 @@ time = [0 30 60];
 %% Basis functions
 n=60; % number of basis functions
 sigma = 1.5; %variance
-mu = linspace(0,max(time),n);
+mu = linspace(1,max(time)-1,n);
 
 phi = zeros(n,length(trajT));
 for i = 1:n 
