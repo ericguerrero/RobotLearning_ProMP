@@ -1,18 +1,17 @@
-%% Eric's code with just added the CI computed with the covariacne matrix 
-
 clc;close all;clear all; format compact;
 
 %% Demostrations
-num = 30; % # of demostrations
-position = [1, 1.5 2]; 
-time = [0 30 60];  
-[trajT, trajX] = trajGeneration(num,position,time);
+num = 20; % # of demostrations
+position = [1 2.5 2 0.5 -1]; 
+time = [0 .4 .6 .8 1];  
+delta_time = 0.001
+[trajT, trajX] = trajGeneration(num,position,time,delta_time);
 
 %% Basis functions
-n=60; % number of basis functions
-sigma = 1.5; %variance
-mu = linspace(1,max(time)-1,n);
-    
+n=20; % number of basis functions
+sigma = 0.001; %variance
+mu = linspace(0,1,n);
+
 phi = zeros(n,length(trajT));
 for i = 1:n 
     phi(i,:)=gaussBasis(trajT,mu(i),sigma); % one bf per row
@@ -44,21 +43,36 @@ cov_y = (trajX-phi'*w)*(trajX-phi'*w)'/(num*n);
 % lamda = 10^(-6);
 % cov_y = (cov_y +cov_y)/2 + eye(size(cov_y))*lamda;
 
-%% Confidence Intervals (95%)
-upper_ci_std_w = phi'*(mu_w+1.96*std_w/sqrt(n));
-lower_ci_std_w = phi'*(mu_w-1.96*std_w/sqrt(n));
+%% Via Points
+var_y_star = 0.000000000001;
+y_star = 0.2;
+t_star = 800;% remake
+mu_w_VP = mu_w + cov_w*phi(:,t_star)*inv(var_y_star + phi(:,t_star)'*cov_w*phi(:,t_star))*(y_star-phi(:,t_star)' * mu_w);
+cov_w_VP = cov_w - cov_w*phi(:,t_star)*inv(var_y_star + phi(:,t_star)'*cov_w*phi(:,t_star)) * phi(:,t_star)'*cov_w;
 
-% this I have no Idea about what CI is  :D
+
+
+
+%% Confidence Intervals (¿95%?)
+% Trajectories CI
 upper_ci = phi'*(mu_w+2*sqrt(diag(cov_w)));
 lower_ci = phi'*(mu_w-2*sqrt(diag(cov_w)));
 
-%% Plots
 
+% Trajectories with Via Points CI
+upper_ci_VP = phi'*(mu_w_VP+2*sqrt(diag(cov_w_VP)));
+lower_ci_VP = phi'*(mu_w_VP-2*sqrt(diag(cov_w_VP)));
+
+
+%% Plots
+%% Plot Mean trajectory with CI's
+close all;figure(1);hold on;grid on;
 % Demostrations
-plot(trajT,trajX,'k');hold on;grid on;
+plot(trajT,trajX,'k')
 
 % Basis functions
-plot(trajT,phi,'g');
+scale = 10^2;
+plot(trajT,phi*scale,'g');
 
 % Weights
 %plot(mu,w/40,'r');
@@ -67,30 +81,40 @@ plot(trajT,phi,'g');
 plot(trajT,mu_y,'r','lineWidth',2);
 
 % CI 
-plot(trajT,upper_ci,'--r','lineWidth',3);
-plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
+fill_between_lines(trajT,upper_ci,lower_ci,[1 0 0],0.4)
+plot(trajT,upper_ci,'r');
+plot(trajT,lower_ci,'r');
 title(sprintf('%d trajectories     %d basis functions',num,n))
 
-fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
 
-hold off
 
-%% 2nd plot - select a random trajectory
-w_traj = mvnrnd(mu_w,cov_w)';
+%% Plot Random trajectory with CI's and VP
+figure(2);title('Random Trajectory created from the fit of the weights');hold on; grid on;
+% Mean Trajectories
+trajectory = phi'*mu_w;
+plot(trajT,trajectory,'r');
+trajectory = phi'*mu_w_VP;
+plot(trajT,trajectory,'g');
+
+% Trajectory generation
+w_traj = mvnrnd(mu_w_VP,cov_w_VP)';
 trajectory = phi'*w_traj;
+plot(trajT,trajectory,'b','lineWidth',2);
 
-figure(2)
-plot(trajT,trajectory,'r','lineWidth',2);
-hold on; grid on;
-plot(trajT,upper_ci,'--r','lineWidth',3);
-plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
-fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
-title('Random Trajectory created from the fit of the weights')
+% Initial CI's
+fill_between_lines(trajT,upper_ci,lower_ci,[1 0 0],0.3)
+plot(trajT,upper_ci,'r');
+plot(trajT,lower_ci,'r');
 
+
+% Via point CI's
+fill_between_lines(trajT,upper_ci_VP,lower_ci_VP,[0 1 0],0.3)
+
+plot(trajT,upper_ci_VP,'g');
+plot(trajT,lower_ci_VP,'g');
+
+
+%%
 str='Y';
 while((strcmp(str,'Y') || strcmp(str,'y')))
     str = input('New trajectory?[Y/N]','s')
@@ -113,8 +137,6 @@ figure(3)
 hold on; grid on;
 plot(trajT,upper_ci,'--r','lineWidth',3);
 plot(trajT,lower_ci,'--r','lineWidth',3);
-plot(trajT,upper_ci_std_w,'--b','lineWidth',3);
-plot(trajT,lower_ci_std_w,'--b','lineWidth',3);
 fill_between_lines(trajT,upper_ci,lower_ci,[0 1 0],0.3)
 title(sprintf('%d sampled trajectories',N_ITERATIONS))
 
@@ -123,6 +145,6 @@ for i=1:N_ITERATIONS
     w_traj = mvnrnd(mu_w,cov_w)';
     trajectory = phi'*w_traj;
     figure(3)
-    plot(trajT,trajectory,'r','lineWidth',2);
+    plot(trajT,trajectory,'r');
     pause(0.1)
 end
