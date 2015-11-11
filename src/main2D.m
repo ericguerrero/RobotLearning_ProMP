@@ -9,9 +9,11 @@ clc;close all;clear all; format compact;
 % Set Demostrations
 num = 20; % # of demostrations
 coordsX = [0 .4 .6 .8 1 ; 1 2.5 2 0.5 -1]; 
+coordsY = [0 .4 .6 .8 1 ; 0.2 1 0.5 1.5 2]; 
 samples = 1000;
 time = linspace(0,1,samples)';
 coordDemoX = setDemonstrations(num,coordsX,time,samples);
+coordDemoY = setDemonstrations(num,coordsY,time,samples);
 
 % Basis functions
 n=20; % number of basis functions
