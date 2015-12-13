@@ -12,4 +12,7 @@ xlabel('x')
 ylabel('y')
 zlabel('z')
 
-writeCartesianTrajectory('ct.txt',trajectory,25)
+for i=1:size(traj,3)
+    name = sprintf('demoTraj%d.txt',i-1);
+    writeCartesianTrajectory(name,traj(:,:,i)',25)
+end

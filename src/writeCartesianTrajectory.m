@@ -8,6 +8,8 @@ if size(trajectory,1) ~=3
     error('The trajectory passed to writeCartesianTrajectory function has not the correct format 3xn')
 end
 
+delete(name);
+
 %open file
 fileID = fopen(name,'w');
 
