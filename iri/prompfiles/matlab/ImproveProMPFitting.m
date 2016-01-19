@@ -3,9 +3,10 @@ clear;
 
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
-trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
+%trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
+trajpath = './traj2';
 
-trajname = 'newProMpParams';% name of the file to load (with out mw or Sw)
+trajname = 'RL_03';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
 %trajname = [trajpath '/gerardProMpfeed'];% full feed
 %trajname = [trajpath '/justfeed'];% just feed;
@@ -23,7 +24,7 @@ dof=size(demoY,2);
 mw=load(sprintf('%smw.txt', trajname)); % carreguem la mitja de la ProMP
 Sw=load(sprintf('%sSw.txt', trajname)); % carreguem la Sw
 
-Nf=size(mw,1)/dof; % AL LORO! el reproduce ProMP agafa això d¡un arxiu
+Nf=size(mw,1)/dof; % AL LORO! el reproduce ProMP agafa aix?? d??un arxiu
 C=(0:1:Nf-1)/Nf;%0:0.1:0.9;
 D=0.025;
 Y=[];
@@ -31,7 +32,7 @@ SY=[];
 Sw=Sw+eye(size(Sw))*0.1;%1e-3; 
 
 if(min(eig(Sw))<0)
-   warning('REGULARITZAR MILLOR!') % Aka sumarli més a la Sw.
+   warning('REGULARITZAR MILLOR!') % Aka sumarli m??s a la Sw.
 end
 
 %% PLOT RESULTATS
@@ -101,8 +102,8 @@ end
 
 figure;
 for i = 1:dof
-    %subplot(2,3,i);
-    figure
+    subplot(2,3,i);
+%     figure
     hold on;
     for d = 1:Ndemos
         plot(demoY(:,i,d),'k', 'LineWidth', 1);
