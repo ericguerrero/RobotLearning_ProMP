@@ -4,9 +4,9 @@ clear;
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
 %trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
-trajpath = './traj2';
+trajpath = './test2';
 
-trajname = 'RL_03';% name of the file to load (with out mw or Sw)
+trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
 %trajname = [trajpath '/gerardProMpfeed'];% full feed
 %trajname = [trajpath '/justfeed'];% just feed;
@@ -109,12 +109,12 @@ for i = 1:dof
         plot(demoY(:,i,d),'k', 'LineWidth', 1);
     end
     plot(Y(:,i),'b', 'LineWidth', 2);
-    plot(Y(:,i)+SY(:,i),'b', 'LineWidth', 1);
-    plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
+%     plot(Y(:,i)+SY(:,i),'b', 'LineWidth', 1);
+%     plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
     
     plot(Ynew(:,i),'r','LineWidth', 2);
-    plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
-    plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
+%     plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
+%     plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
     
 end
 csvwrite(sprintf('%s_new_mw.txt', trajname),mwnew);

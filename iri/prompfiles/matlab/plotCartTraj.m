@@ -74,17 +74,19 @@ Nt=118;
 
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
-trajpath = './trajs/gerardJustFeed';
+%trajpath = './trajs/gerardJustFeed';
+trajpath = './traj2';
 
-trajname = 'newProMpParams';
+%trajname = 'newProMpParams';
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
 %trajname = [trajpath '/gerardProMpfeed'];% full feed
 %trajname = [trajpath '/justfeed'];% just feed;
+trajname = 'RL_03';
 
 mw=load(sprintf('%smw.txt', trajname)); % carreguem la mitja de la ProMP
 Sw=load(sprintf('%sSw.txt', trajname)); % carreguem la Sw
 
-Ndemos = 5;
+Ndemos = 10;
 
 Nf=size(mw,1)/dof;
 C=(0:1:Nf-1)/Nf;%0:0.1:0.9;
@@ -99,7 +101,7 @@ end
 % change trajectory
 
 %% punt desitjat -- JUGAR AQUI
-points = []% [43];[99]; % 99 outpoint%[185, 44]; %% C traj
+points = [10]% [43];[99]; % 99 outpoint%[185, 44]; %% C traj
 %points = [102]; %% Feed traj
 cov_ratio = ones(size(points))*10;%[ 1 1 1];
 ydesinc = [[+0.1 -0.11 +0.1]; %x, y, z
