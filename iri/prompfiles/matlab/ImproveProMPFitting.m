@@ -4,7 +4,7 @@ clear;
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
 %trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
-trajpath = './test2';
+trajpath = './test4';
 
 trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
