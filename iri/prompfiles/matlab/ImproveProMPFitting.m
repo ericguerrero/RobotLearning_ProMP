@@ -4,7 +4,7 @@ clear;
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
 %trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
-trajpath = './test4';
+trajpath = './table_parallel_slow';
 
 trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
@@ -116,9 +116,14 @@ for i = 1:dof
 %     plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
     
     plot(Ynew(:,i),'r','LineWidth', 2);
-%     plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
-%     plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
+    plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
+    plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
     
 end
-csvwrite(sprintf('%s_new_mw.txt', trajname),mwnew);
-csvwrite(sprintf('%s_new_Sw.txt', trajname),Swnew);
+csvwrite([trajpath,'/', sprintf('%s_new_mw.txt', trajname)],mwnew);
+csvwrite([trajpath,'/', sprintf('%s_new_Sw.txt', trajname)],Swnew);
+
+%% Via point
+viaPoint =[0.8*samples, 0.9];
+viaPoint_var = 0.01;
+[mu_w_VP, cov_w_VP] = constrainWeights(mu_w, cov_w, phi, viaPoint, viaPoint_var);

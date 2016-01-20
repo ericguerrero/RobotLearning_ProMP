@@ -5,18 +5,15 @@ clc;clear;close all;format compact;
 % trajname = 'RL_02';     % name of the file to load (with out mw or Sw)
 % trajpath = './traj2';   % path to the folder where the files are located
 % trajname = 'RL_03';     % name of the file to load (with out mw or Sw)
-trajpath = './test2';   % path to the folder where the files are located
+trajpath = './table_parallel_slow';   % path to the folder where the files are located
 trajname = 'test';  
 
 Ndemos = 10;            % number of the demos = number of cartesian trajectories
 
-% for k=1:Ndemos
-%  traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
-%  demoY(:,:,k)=traj; % (time, dof, demo)
-% end
-
-demoY=loadTraj(trajpath,Ndemos);
-
+for k=1:Ndemos
+    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
+    demoY(:,:,k)=traj; % (time, dof, demo)
+end
 demoY=demoY(1:size(demoY,1),:,:);
 Nt=size(demoY,1);   % number of time steps
 dof=size(demoY,2);  % dof
@@ -28,11 +25,13 @@ Sw=load(sprintf('%sSw.txt', trajname)); % covariance
 
 %% Plot trajectories
 figure(1);
+xmin = [0,0,0,0,0,0];xmax = [60,60,60,60,60,60];
+ymin = [0.2,-0.5,-0.1,-1,-1,-1];ymax = [0.8,0.5,0.1,1,1,1];
 for i=1:dof
     strPlot = ['23',num2str(i)]; % for dof=6
     subplot(strPlot);hold on;
     for k=1:Ndemos % Plot trajectories
-        plot(demoY(:,i,k))
+        plot(demoY(:,i,k)); axis([xmin(i) xmax(i) ymin(i) ymax(i)]);
     end
 end
 
