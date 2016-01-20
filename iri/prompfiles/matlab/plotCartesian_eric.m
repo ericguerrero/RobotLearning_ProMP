@@ -10,10 +10,13 @@ trajname = 'test';
 
 Ndemos = 10;            % number of the demos = number of cartesian trajectories
 
-for k=1:Ndemos
-    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
-    demoY(:,:,k)=traj; % (time, dof, demo)
-end
+% for k=1:Ndemos
+%  traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
+%  demoY(:,:,k)=traj; % (time, dof, demo)
+% end
+
+demoY=loadTraj(trajpath,Ndemos);
+
 demoY=demoY(1:size(demoY,1),:,:);
 Nt=size(demoY,1);   % number of time steps
 dof=size(demoY,2);  % dof

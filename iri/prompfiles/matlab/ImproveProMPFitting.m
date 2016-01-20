@@ -11,11 +11,14 @@ trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardProMpfeed'];% full feed
 %trajname = [trajpath '/justfeed'];% just feed;
 
-Ndemos = 5; % <<<<< IMPORTANT: number of the demos = number of cartesian trajectories
-for k=1:Ndemos
-    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
-    demoY(:,:,k)=traj; % (time, dof, demo)
-end
+Ndemos = 10; % <<<<< IMPORTANT: number of the demos = number of cartesian trajectories
+% for k=1:Ndemos
+%     traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
+%     demoY(:,:,k)=traj; % (time, dof, demo)
+% end
+
+demoY=loadTraj(trajpath,Ndemos);
+
 demoY=demoY(1:size(demoY,1),:,:);
 Nt=size(demoY,1);
 dof=size(demoY,2);
@@ -62,8 +65,8 @@ for iteration=1:100
 %          break 
 %       else
 	  % compute the weights and the covariance with Expectation Maximization
-          [Om_new,mwnew,WK,Swnew,Sy,MK,Sk,GTpos]=ProMP_WMLE(demoY,dof,eye(dof),WK,mwnew,Swnew,eye(dof)*0.5,ones(5,1),GGT);
-          L=Weightedlikelihood(Swnew,Sk,Sy,demoY,eye(dof),MK,GTpos,mwnew,ones(5,1));
+          [Om_new,mwnew,WK,Swnew,Sy,MK,Sk,GTpos]=ProMP_WMLE(demoY,dof,eye(dof),WK,mwnew,Swnew,eye(dof)*0.5,ones(Ndemos,1),GGT);
+          L=Weightedlikelihood(Swnew,Sk,Sy,demoY,eye(dof),MK,GTpos,mwnew,ones(Ndemos,1));
           LL=[LL;L];
 %       end
 %       maxeigold=max(eig(Swnew));
