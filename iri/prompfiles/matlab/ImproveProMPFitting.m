@@ -12,10 +12,13 @@ trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/justfeed'];% just feed;
 
 Ndemos = 10; % <<<<< IMPORTANT: number of the demos = number of cartesian trajectories
-for k=1:Ndemos
-    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
-    demoY(:,:,k)=traj; % (time, dof, demo)
-end
+% for k=1:Ndemos
+%     traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
+%     demoY(:,:,k)=traj; % (time, dof, demo)
+% end
+
+demoY=loadTraj(trajpath,Ndemos);
+
 demoY=demoY(1:size(demoY,1),:,:);
 Nt=size(demoY,1);
 dof=size(demoY,2);
