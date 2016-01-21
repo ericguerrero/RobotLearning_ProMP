@@ -4,7 +4,7 @@ clear;
 %trajpath = './trajs/C_trajectory';
 %trajpath = './trajs/gerardProMptest';
 %trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
-trajpath = './table_parallel_slow';
+trajpath = './narrow_passage_initial_points';
 
 trajname = 'test';% name of the file to load (with out mw or Sw)
 %trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
@@ -22,6 +22,7 @@ demoY=loadTraj(trajpath,Ndemos);
 demoY=demoY(1:size(demoY,1),:,:);
 Nt=size(demoY,1);
 dof=size(demoY,2);
+
 
 %here it is loading the weights and the covariance
 mw=load(sprintf('%smw.txt', trajname)); % carreguem la mitja de la ProMP
@@ -60,7 +61,7 @@ maxeigold=1000000;
  LL=[];
 for iteration=1:100
 %      [iteration max(eig(Swnew))]
-      [iteration L]
+      [iteration L];
 %       if maxeigold<max(eig(Swnew))
 %          break 
 %       else
@@ -122,8 +123,9 @@ for i = 1:dof
 end
 csvwrite([trajpath,'/', sprintf('%s_new_mw.txt', trajname)],mwnew);
 csvwrite([trajpath,'/', sprintf('%s_new_Sw.txt', trajname)],Swnew);
-
-%% Via point
-viaPoint =[0.8*samples, 0.9];
-viaPoint_var = 0.01;
-[mu_w_VP, cov_w_VP] = constrainWeights(mu_w, cov_w, phi, viaPoint, viaPoint_var);
+csvwrite([trajpath,'/', sprintf('%s_old_mw.txt', trajname)],mw);
+csvwrite([trajpath,'/', sprintf('%s_old_Sw.txt', trajname)],Sw);
+% %% Via point
+% viaPoint =[0.8*samples, 0.9];
+% viaPoint_var = 0.01;
+% [mu_w_VP, cov_w_VP] = constrainWeights(mu_w, cov_w, phi, viaPoint, viaPoint_var);
