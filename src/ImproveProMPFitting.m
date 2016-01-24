@@ -1,19 +1,13 @@
 close all;
 clear;
-
-%trajpath = './trajs/C_trajectory';
-%trajpath = './trajs/gerardProMptest';
-%trajpath = './trajs/gerardJustFeed';% this is the path to the folder where the files are located
-trajpath = './joint_traj_final';
-
-trajname = 'test';% name of the file to load (with out mw or Sw)
-%trajname = [trajpath '/gerardPROMPparamsTest']; %% C trajectory
-%trajname = [trajpath '/gerardProMpfeed'];% full feed
-%trajname = [trajpath '/justfeed'];% just feed;
+%% Load files (specify Ndemos)
+trajpath = '../experiments/narrow_passage_box';   
+trajname = 'test';  
+Ndemos = 20;   
 
 Ndemos = 10; % <<<<< IMPORTANT: number of the demos = number of cartesian trajectories
 for k=1:Ndemos
-    traj = load(sprintf('%s/shifted%d.txt', trajpath, k-1));   
+    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
     demoY(:,:,k)=traj; % (time, dof, demo)
 end
 
@@ -125,7 +119,6 @@ csvwrite([trajpath,'/', sprintf('%s_new_mw.txt', trajname)],mwnew);
 csvwrite([trajpath,'/', sprintf('%s_new_Sw.txt', trajname)],Swnew);
 csvwrite([trajpath,'/', sprintf('%s_old_mw.txt', trajname)],mw);
 csvwrite([trajpath,'/', sprintf('%s_old_Sw.txt', trajname)],Sw);
-% %% Via point
-% viaPoint =[0.8*samples, 0.9];
-% viaPoint_var = 0.01;
-% [mu_w_VP, cov_w_VP] = constrainWeights(mu_w, cov_w, phi, viaPoint, viaPoint_var);
+
+
+ 

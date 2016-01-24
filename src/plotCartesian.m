@@ -1,132 +1,98 @@
 clc;clear;close all;format compact;
 
 %% Load files (specify Ndemos)
-% trajpath = './traj1';   % path to the folder where the files are located
-% trajname = 'RL_02';     % name of the file to load (with out mw or Sw)
-% trajpath = './traj2';   % path to the folder where the files are located
-% trajname = 'RL_03';     % name of the file to load (with out mw or Sw)
-trajpath = './narrow_passage_box';   % path to the folder where the files are located
+trajpath = '../experiments/narrow_passage_box';   
 trajname = 'test';  
-
-Ndemos = 20;            % number of the demos = number of cartesian trajectories
-
-for k=1:Ndemos
-    traj = load(sprintf('%s/Cartesian%d.txt', trajpath, k-1));   
-    demoY(:,:,k)=traj; % (time, dof, demo)
-end
-demoY=demoY(1:size(demoY,1),:,:);
-Nt=size(demoY,1);   % number of time steps
-dof=size(demoY,2);  % dof
-time = 1:Nt;
-
-% Load the weights and the covariance
-mw=load(sprintf('%smw.txt', trajname)); % mean
-Sw=load(sprintf('%sSw.txt', trajname)); % covariance
-
-%% Plot trajectories
-figure(1);
-xmin = [0,0,0,0,0,0];xmax = [60,60,60,60,60,60];
-ymin = [0.2,-0.5,-0.1,-1,-1,-1];ymax = [0.8,0.5,0.1,1,1,1];
-for i=1:dof
-    strPlot = ['23',num2str(i)]; % for dof=6
-    subplot(strPlot);hold on;
-    for k=1:Ndemos % Plot trajectories
-        plot(demoY(:,i,k)); axis([xmin(i) xmax(i) ymin(i) ymax(i)]);
-    end
-end
+Ndemos = 20;   
+[demoY,Nt, dof, x, mw, Sw] = loadTrajectory(trajpath, trajname, Ndemos);
 
 
-%% Basis functions
-n = Nt;           % number of basis functions
-sigma = 1.5;    %variance
-mu = linspace(0, Nt, n);
+%% Distributions
+Nf=size(mw,1)/dof;  % # of basis functions
+C=(0:1:Nf-1)/Nf;    % Centers
+D=0.025;            % Amplitud
 
-phi = zeros(n,Nt);
-for i = 1:n 
-    phi(i,:)=gaussBasis(time,mu(i),sigma); % one bf per row
-    phi(i,:)=phi(i,:)/sum(phi(i,:));
-end
+PHI = obtainPhi(Nf,Nt,dof,C,D);
 
-%% Get weights
-w = zeros(n,dof,Ndemos);
-for k = 1:Ndemos %For each demostration
-    y = demoY(:,:,k);
-    %% Least squares
-    weight=pinv(phi')*y;
-    w(:,:,k)=weight;
-end
+% Get weights
+DEMOY = reshape(demoY,Nt*dof,Ndemos);
+w = pinv(PHI')*DEMOY;
 
 % Mean
-mu_w = mean(w,3);
+mu_w = mean(w,2);
+
 % Standard deviation
-std_w= std(w,0,3);
-% % Covariance
-% cov_w = (w-mu_w*ones(1,Ndemos))*(w-mu_w*ones(1,Ndemos))'/Ndemos;
-% lamda = 10^(-3);
-% cov_w = (cov_w +cov_w)/2 + eye(size(cov_w))*lamda;
+std_w = std(w,0,2);
+
+% Covariance
+cov_w = (w-mu_w*ones(1,Ndemos))*(w-mu_w*ones(1,Ndemos))'/Ndemos;
+
+%Mean Trajectory
+mu_y = PHI'*mu_w; 
+Mean_Traj = reshape(mu_y,Nt,dof);
+
+% Confidence intervals
+upper_ci = PHI'*(mu_w+1.96*std_w/sqrt(Nf)); % Confidence Intervals (95%)
+lower_ci = PHI'*(mu_w-1.96*std_w/sqrt(Nf)); % Confidence Intervals (95%)
+upper_ci = reshape(upper_ci,Nt,dof);
+lower_ci = reshape(lower_ci,Nt,dof);
+
+% Sample trajectories
+[Sampled_Traj] = sampleTrajectories(5,mu_w,cov_w,PHI,Nt,dof);
+
+%% Via Points
+t = [1, 1, 1]';
+y = [0.7, 0.2, -0.25]';
+via_point_var = 0.3*eye(3);
+
+mu_w_vp = mu_w + cov_w*PHI(:,t)*inv(via_point_var + PHI(:,t)'*cov_w*PHI(:,t))*(y-PHI(:,t)' * mu_w);
+cov_w_vp = cov_w - cov_w*PHI(:,t)*inv(via_point_var + PHI(:,t)'*cov_w*PHI(:,t)) * PHI(:,t)'*cov_w;
+mu_y_vp = PHI'*mu_w_vp;  
+Mean_Traj_vp = reshape(mu_y_vp,Nt,dof);
+
+% Confidence intervals
+upper_ci_vp = PHI'*(mu_w_vp+1.96*diag(cov_w_vp)/sqrt(Nf)); % Confidence Intervals (95%)
+lower_ci_vp = PHI'*(mu_w_vp-1.96*diag(cov_w_vp)/sqrt(Nf)); % Confidence Intervals (95%)
+upper_ci_vp = reshape(upper_ci_vp,Nt,dof);
+lower_ci_vp = reshape(lower_ci_vp,Nt,dof);
+
+% Sample trajectories
+Sampled_Traj_vp = sampleTrajectories(5,mu_w_vp,cov_w_vp,PHI,Nt,dof);
+
+%% Plot trajectories
+figure(1); hold on;
+plot2D(x,demoY,'b',1)
+plot2D(x,Mean_Traj,'r',2)
+% plot2D(x,upper_ci,'--r',2)
+% plot2D(x,lower_ci,'--r',2)
+plot2D(x,Sampled_Traj,'r',1)
 
 
-
-mu_y = phi'*mu_w;  %Mean Traj
-upper_ci = phi'*(mu_w+1.96*std_w/sqrt(n)) % Confidence Intervals (95%)
-lower_ci = phi'*(mu_w-1.96*std_w/sqrt(n)) % Confidence Intervals (95%)
-
-%% Plots
-for i=1:dof
-    strPlot = ['23',num2str(i)]; % for dof=6
-    subplot(strPlot);hold on;
-    
-    % Basis functions
-    %plot(time,phi,'g');
-
-    % Weights
-    %plot(mu,w/40,'r');
-
-    % Trajectory
-    plot(time,mu_y(:,i),'r','lineWidth',2);
-    
-    % CI
-%     plot(time,upper_ci(:,i),'--r','lineWidth',2);
-%     plot(time,lower_ci(:,i),'--r','lineWidth',2);
-    hold off
-end
-
-%% Plot3D
+% Plot3D
 figure(2);hold on;
-for i=1:Ndemos
-    trajX = reshape(demoY(:,1,:),Nt,Ndemos);
-    trajY = reshape(demoY(:,2,:),Nt,Ndemos);
-    trajZ = reshape(demoY(:,3,:),Nt,Ndemos);
-    plot3(trajX,trajY,trajZ,'b');
-end
-plot3(mu_y(:,1),mu_y(:,2),mu_y(:,3),'r','lineWidth',2)
+plot3D(demoY,'b')
+plot3D(Sampled_Traj,'r')
+plot3(Mean_Traj(:,1),Mean_Traj(:,2),Mean_Traj(:,3),'r','lineWidth',2);
+
+%% Via Points Plots 
+figure(1); hold on;
+plot2D(x,Mean_Traj_vp,'g',2)
+% plot2D(x,upper_ci_vp,'--g',2)
+% plot2D(x,lower_ci_vp,'--g',2)
+plot2D(x,Sampled_Traj_vp,'g',1)
+
+
+% Plot3D
+figure(2);hold on;
+plot3D(Sampled_Traj_vp,'g')
+plot3(Mean_Traj_vp(:,1),Mean_Traj_vp(:,2),Mean_Traj_vp(:,3),'g','lineWidth',2);
 
 
 %% Comparative
-% figure(1)
-% load EM_traj.mat
-% for i=1:dof
-%     strPlot = ['23',num2str(i)]; % for dof=6
-%     subplot(strPlot);hold on;
-%     % Trajectory
-%     plot(time,Y(:,i),'y','lineWidth',2);
-%     plot(time,Ynew(:,i),'g','lineWidth',2);
-% end
-% figure(2)
-% plot3(Y(:,1),Y(:,2),Y(:,3),'y','lineWidth',2)
-% plot3(Ynew(:,1),Ynew(:,2),Ynew(:,3),'g','lineWidth',2)
-
-% %% Plot Weights
 % figure(3)
-% i = 1;
-% for i=1:dof
-%     strPlot = ['23',num2str(i)]; % for dof=6
-%     subplot(strPlot);hold on;
-%     % Weights
-%     for k=1:Ndemos
-%     plot(mu,w(:,i,k),'r');
-%     end
-%     plot(mw(i:(i+9)),'b');
-%     i = i+10;
-% end
+% % Weights
+% mu_w_reshaped = reshape(mu_w,Nf*dof,1);
+% plot(mw,'b');hold on;
+% plot(mu_w_reshaped,'g')
+
 
