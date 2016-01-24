@@ -35,7 +35,7 @@ Mean_Traj = reshape(mu_y,Nt,dof);
 
 
 % Confidence intervals
-std_y = reshape(2*real(sqrt(diag(PHI'*cov_w*PHI)')),Nt,dof);
+std_y = reshape(2*real(sqrt(diag(PHI'*cov_w*PHI))),Nt,dof);
 u_ci = Mean_Traj + std_y;
 l_ci = Mean_Traj - std_y;
 
@@ -43,9 +43,9 @@ l_ci = Mean_Traj - std_y;
 Sampled_Traj = sampleTrajectories(5,mu_w,cov_w,PHI,Nt,dof);
 
 %% Via Points
-T = round([0.8,0.8,0.8]'*Nt);
-Y = [0.40,0.2,-0.25]';
-via_point_var = 0.001*eye(size(Y,2));
+T = round([0.9,0.9,0.9]'*Nt);
+Y = [0.40,0.3,-0.25]';
+via_point_var = 0.0001*eye(size(Y,2));
 
 for k=1:3
     t = T(k);
@@ -63,13 +63,13 @@ for k=1:3
 %     upper_ci_vp = reshape(upper_ci_vp,Nt,dof);
 %     lower_ci_vp = reshape(lower_ci_vp,Nt,dof);
 
-    % Sample trajectories
+    % Sample trajectoriesz
 %     Sampled_Traj_vp = sampleTrajectories(5,mu_w_vp,cov_w_vp,PHI,Nt,dof);
     
     mean_vp(:,k) = Mean_Traj_vp(:,k);
-    std_vp = reshape(2*real(sqrt(diag(PHI'*cov_w_vp*PHI)')),Nt,dof);
-    u_ci_vp(:,k) = Mean_Traj_vp(:,k)+std_vp(:,k);
-    l_ci_vp(:,k) = Mean_Traj_vp(:,k)-std_vp(:,k);
+    std_vp = 2*real(sqrt(diag(PHI'*cov_w_vp*PHI)));
+    u_ci_vp(:,k) = Mean_Traj_vp(:,k)+std_vp(1:Nt);
+    l_ci_vp(:,k) = Mean_Traj_vp(:,k)-std_vp(1:Nt);
 end
 %% Plots
 figure(1); hold on;
@@ -89,7 +89,7 @@ for k=1:3
     plot(x',Mean_Traj(:,k),'r','lineWidth',2)
     plot(x',u_ci(:,k),'r')
 %     legend('mean','mean VP','CI','CI VP','demos','location','BestOutside');
-    axis([xmin, xmax, ymin(k), ymax(k)]);
+%     axis([xmin, xmax, ymin(k), ymax(k)]);
     xlabel('time [0-1]');ylabel(DOF(k))
 end
 
@@ -108,10 +108,9 @@ for k=1:3
     plot(x',u_ci(:,k),'r')
     plot(x',u_ci_vp(:,k),'g')
 %     legend('mean','mean VP','CI','CI VP','demos','location','BestOutside');
-    axis([xmin, xmax, ymin(k), ymax(k)]);
+%     axis([xmin, xmax, ymin(k), ymax(k)]);
     xlabel('time [0-1]');ylabel(DOF(k))
+    plot(T(k)/Nt,Y(k),'bX','markerSize',10,'lineWidth',2)
 end
-
-
 
 rmpath(trajpath);
