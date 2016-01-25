@@ -121,27 +121,40 @@ for k=1:Nsamples
 end
 
 
-% Plot
-figure;
+%% Plot
+% Demos
 for i = 1:dof
-    subplot(2,4,i);
+    figure(i);
 %     figure
     hold on;
     for d = 1:Ndemos
-        plot(demoY(:,i,d),'k', 'LineWidth', 1);
+        plot(demoY(:,i,d),'b', 'LineWidth', 1);
     end
+    fill_between_lines(x',u_ci(:,k),l_ci(:,k),[1 0 0],0.2)
+    plot(Y(:,i),'r', 'LineWidth', 2);
+    plot(Y(:,i)+SY(:,i),'r', 'LineWidth', 1);
+    plot(Y(:,i)-SY(:,i),'r', 'LineWidth', 1);
+
+end
+for i = 1:dof
+    figure(i);
+%     figure
+    hold on;
     for s = 1:Nsamples
         plot(SampledTraj(:,i,s),'g', 'LineWidth', 1);
     end
     plot(Y(:,i),'b', 'LineWidth', 2);
-%     plot(Y(:,i)+SY(:,i),'b', 'LineWidth', 1);
-%     plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
+    plot(Y(:,i)+SY(:,i),'b', 'LineWidth', 1);
+    plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
     
     plot(Ynew(:,i),'r','LineWidth', 2);
     plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
     plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
 
 end
+
+
+
 csvwrite([trajpath,'/', sprintf('%s_new_mw.txt', trajname)],mwnew);
 csvwrite([trajpath,'/', sprintf('%s_new_Sw.txt', trajname)],Swnew);
 csvwrite([trajpath,'/', sprintf('%s_old_mw.txt', trajname)],mw);
