@@ -1,10 +1,10 @@
 close all;
 clear;
 %% Load files (specify Ndemos)
-trajpath = '../experiments/avoidance_ball_01';
+trajpath = '../experiments/joint_traj_final';
 addpath(trajpath);
 trajname = 'test';  
-Ndemos = 5;   
+Ndemos = 10;   
 [demoY,Nt, dof, x, mw, Sw] = loadTrajectory(trajpath, trajname, Ndemos,'shifted');
 
 
@@ -122,38 +122,51 @@ end
 
 
 %% Plot
+close all;
 % Demos
+DOF = {'J1','J2','J3','J4','J5','J6','J7'};
 for i = 1:dof
     figure(i);
-%     figure
-    hold on;
+%     subplot(2,4,i)
+    hold on;grid on;
     for d = 1:Ndemos
-        plot(demoY(:,i,d),'b', 'LineWidth', 1);
+        plot(x',demoY(:,i,d),'k', 'LineWidth', 1.25);
     end
-    fill_between_lines(x',u_ci(:,k),l_ci(:,k),[1 0 0],0.2)
-    plot(Y(:,i),'r', 'LineWidth', 2);
-    plot(Y(:,i)+SY(:,i),'r', 'LineWidth', 1);
-    plot(Y(:,i)-SY(:,i),'r', 'LineWidth', 1);
-
-end
-for i = 1:dof
-    figure(i);
-%     figure
-    hold on;
-    for s = 1:Nsamples
-        plot(SampledTraj(:,i,s),'g', 'LineWidth', 1);
-    end
-    plot(Y(:,i),'b', 'LineWidth', 2);
-    plot(Y(:,i)+SY(:,i),'b', 'LineWidth', 1);
-    plot(Y(:,i)-SY(:,i),'b', 'LineWidth', 1);
+    u_ci(:,i)=Y(:,i)+SY(:,i)/6;
+    l_ci(:,i)=Y(:,i)-SY(:,i)/6;
+    fill_between_lines(x',u_ci(:,i),l_ci(:,i),[1 0 0],0.2)
+    u_ci_new(:,i)=Ynew(:,i)+SYnew(:,i);
+    l_ci_new(:,i)=Ynew(:,i)-SYnew(:,i);
+    fill_between_lines(x',u_ci_new(:,i),l_ci_new(:,i),[0 0 1],0.2)
+    plot(x',Y(:,i),'r', 'LineWidth', 2.5);
+    plot(x',u_ci(:,i),'r', 'LineWidth', 1);
+    plot(x',l_ci(:,i),'r', 'LineWidth', 1);
     
-    plot(Ynew(:,i),'r','LineWidth', 2);
-    plot(Ynew(:,i)+SYnew(:,i),'r','LineWidth', 1);
-    plot(Ynew(:,i)-SYnew(:,i),'r','LineWidth', 1);
-
+    plot(x',Ynew(:,i),'b','LineWidth', 2.5);
+    plot(x',Ynew(:,i)+SYnew(:,i),'b','LineWidth', 1);
+    plot(x',Ynew(:,i)-SYnew(:,i),'b','LineWidth', 1);
+    xlabel('time [0-1]');ylabel(DOF(k))
+end
+%%
+for i = 1:dof
+    figure(i+7);
+%     subplot(2,4,i)
+    hold on;grid on;
+    
+    u_ci_new(:,i)=Ynew(:,i)+SYnew(:,i);
+    l_ci_new(:,i)=Ynew(:,i)-SYnew(:,i);
+    fill_between_lines(x',u_ci_new(:,i),l_ci_new(:,i),[0 0 1],0.2)
+    
+    plot(x',Ynew(:,i),'b','LineWidth', 2);
+    plot(x',Ynew(:,i)+SYnew(:,i),'b','LineWidth', 1);
+    plot(x',Ynew(:,i)-SYnew(:,i),'b','LineWidth', 1);
+    xlabel('time [0-1]');ylabel(DOF(k))
+    for s = 1:Nsamples
+        plot(x',SampledTraj(:,i,s),'k', 'LineWidth', 1.2);
+    end
 end
 
-
+%%
 
 csvwrite([trajpath,'/', sprintf('%s_new_mw.txt', trajname)],mwnew);
 csvwrite([trajpath,'/', sprintf('%s_new_Sw.txt', trajname)],Swnew);
